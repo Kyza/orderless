@@ -65,22 +65,29 @@ pub fn create_orderless(input: TokenStream) -> TokenStream {
 		})
 		.collect();
 
-	let public = if let Some(public) = options.public {
+	let before_public;
+	let after_public;
+	if let Some(public) = options.public {
 		if public {
-			quote! {
+			before_public = quote! {
 				#[macro_export]
-			}
+			};
+			after_public = quote! {
+				pub use #name;
+			};
 		} else {
-			quote! {}
+			before_public = quote! {};
+			after_public = quote! {};
 		}
 	} else {
-		quote! {}
+		before_public = quote! {};
+		after_public = quote! {};
 	};
 
 	quote! {
-		#public
+		#before_public
 		macro_rules! #name {
-			( $($arg_name:ident $(= $arg_value:expr)?),* ) => {
+			( $($arg_name:ident $(= $arg_value:expr)?),*$(,)? ) => {
 				::orderless::call_orderless!(
 					func = #func,
 					defs(#(#args),*),
@@ -95,6 +102,7 @@ pub fn create_orderless(input: TokenStream) -> TokenStream {
 				)
 			};
 		}
+		#after_public
 	}
 	.into()
 }
