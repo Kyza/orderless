@@ -16,7 +16,7 @@ categories = ["development-tools::build-utils", "rust-patterns"]
 darling = "0.20.1"
 indexmap = "1.9.3"
 proc-macro-error = "1.0.4"
-proc-macro2 = { version = "1.0.56", features = ["span-locations"] }
+proc-macro2 = "1.0.56"
 quote = "1.0.27"
 syn = { version = "2.0.15", features = ["full"] }
 
