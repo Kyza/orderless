@@ -51,7 +51,7 @@ pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 	let mut creates: Vec<proc_macro2::TokenStream> = vec![];
 
-	// Collect the functions that have make_orderless used on them, and remove the attribute.
+	// Collect the functions that have make_orderless used on them, remove the attribute, and make a `create_orderless!` for it.
 	for item in implementation.items.iter_mut() {
 		let func = if let ImplItem::Fn(func) = item {
 			func
@@ -63,20 +63,16 @@ pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 		for (i, attr) in func.clone().attrs.iter().enumerate() {
 			if attr.path().is_ident("make_orderless") {
-				// make_funcs.push(func.clone());
-
 				// Remove the attribute since macros can't be defined inside of `impl` blocks.
 				func.attrs.remove(i);
 
 				// Get the args.
-				let call = attr
+				let args = attr
 					.clone()
 					.parse_args::<Expr>()
 					.expect("make_orderless was called with no args");
 
-				let args = call;
-
-				// Make a new `create_orderless`.
+				// Make a new `create_orderless!`.
 				creates.push(quote! {
 					::orderless::create_orderless! {
 						func = #impl_name::#func_name,
