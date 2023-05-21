@@ -1,8 +1,13 @@
 use darling::{export::NestedMeta, FromMeta};
-use indexmap::IndexMap;
+use indexmap::{IndexMap, IndexSet};
+use proc_macro2::Span;
 use proc_macro_error::abort;
 
-use syn::{parse_quote, Expr, Ident, Meta, Path};
+use quote::ToTokens;
+use syn::{
+	parse2, parse_quote, Expr, FnArg,
+	Ident, Meta, Pat, Path,
+};
 
 pub fn strict_ident_from_path(path: Path) -> Ident {
 	// It could be an actual path, so test for that.
@@ -72,5 +77,46 @@ impl FromMeta for ArgsIndexMap {
 			}
 		}
 		Ok(ArgsIndexMap(im))
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct IdentIndexSet(pub IndexSet<Ident>);
+
+impl FromMeta for IdentIndexSet {
+	fn from_list(
+		items: &[darling::export::NestedMeta],
+	) -> darling::Result<Self> {
+		let mut is = IndexSet::new();
+		for item in items {
+			let ident = parse2::<Ident>(item.to_token_stream());
+			if let Ok(ident) = ident {
+				is.insert(ident);
+			} else {
+				abort! { item,
+					"expected an identifier";
+					help = "This expression is not an identifier.";
+				}
+			}
+		}
+		Ok(IdentIndexSet(is))
+	}
+}
+
+pub fn ident_from_fn_arg(arg: &FnArg) -> Ident {
+	match arg {
+		FnArg::Typed(arg) => {
+			let Pat::Ident(arg_name) = *arg.pat.clone() else {
+					abort! { arg,
+						"the argument was not an identifier";
+						help = "I don't know how you got here, or how this could\
+						 possibly happen, but apparently it can. So I'm writing\
+						 this message to say that you're doing something wrong\
+						 here... Maybe... Or maybe I am. I have no idea.";
+					}
+				};
+			arg_name.ident
+		}
+		FnArg::Receiver(_) => Ident::new("self", Span::call_site()),
 	}
 }

@@ -5,16 +5,19 @@ use proc_macro::TokenStream;
 use proc_macro_error::abort;
 use quote::quote;
 
+
+
 use syn::{Expr, ExprPath, Ident};
 
-use crate::utils::ArgsIndexMap;
-use crate::utils::DIdent;
+use crate::utils::{ArgsIndexMap};
+use crate::utils::{DIdent, IdentIndexSet};
 
 #[derive(Debug, Clone, FromMeta)]
 pub struct CreateOrderlessOptions {
 	name: Option<DIdent>,
 	public: Option<bool>,
 	func: ExprPath,
+	order: Option<IdentIndexSet>,
 	defs: ArgsIndexMap,
 }
 
@@ -46,6 +49,13 @@ pub fn create_orderless(input: TokenStream) -> TokenStream {
 		}
 	};
 	let mut args: IndexMap<Ident, Option<Expr>> = IndexMap::new();
+
+	// Preserve the order if the args are provided.
+	if let Some(sig) = options.order {
+		for ident in sig.0.into_iter() {
+			args.insert(ident, None);
+		}
+	}
 
 	for (name, value) in options.defs.0 {
 		args.insert(name, value);

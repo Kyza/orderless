@@ -1,7 +1,9 @@
 use darling::FromMeta;
 
 use darling::export::NestedMeta;
+
 use proc_macro::TokenStream;
+
 
 use proc_macro_error::abort;
 use quote::{quote, ToTokens};
@@ -9,7 +11,7 @@ use quote::{quote, ToTokens};
 use syn::Ident;
 use syn::{parse_macro_input, ImplItem, ItemImpl, Meta};
 
-use crate::utils::DIdent;
+use crate::utils::{ident_from_fn_arg, DIdent};
 
 #[derive(Debug, Clone, FromMeta)]
 struct ImplOrderlessOptions {
@@ -61,6 +63,14 @@ pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 		let func_name = &func.sig.ident;
 
+		// Get the names of the args.
+		let inputs = &func.sig.inputs;
+		let mut order = vec![];
+		for input in inputs {
+			order.push(ident_from_fn_arg(input));
+		}
+		let order: Vec<_> = order.iter().collect();
+
 		for (i, attr) in func.clone().attrs.iter().enumerate() {
 			if attr.path().is_ident("make_orderless") {
 				// Remove the attribute since macros can't be defined inside of `impl` blocks.
@@ -77,6 +87,7 @@ pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 				creates.push(quote! {
 					::orderless::create_orderless! {
 						func = #impl_name::#func_name,
+						order(#(#order),*),
 						#args
 					}
 				});

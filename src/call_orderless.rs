@@ -33,6 +33,14 @@ pub fn call_orderless(input: TokenStream) -> TokenStream {
 	let func = options.func;
 	let mut args: IndexMap<Ident, Option<Expr>> = IndexMap::new();
 
+	// This isn't needed because the macros combine it with `defs` before here, but I'm keeping this here just in case.
+	// Preserve the order if the args are provided.
+	// if let Some(sig) = options.order {
+	// 	for ident in sig.0.into_iter() {
+	// 		args.insert(ident, None);
+	// 	}
+	// }
+
 	for (name, value) in options.defs.0.clone() {
 		args.insert(name, value);
 	}

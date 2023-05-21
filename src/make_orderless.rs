@@ -1,15 +1,15 @@
 use darling::{export::NestedMeta, FromMeta};
 use indexmap::IndexMap;
 use proc_macro::TokenStream;
-use proc_macro2::Span;
-use proc_macro_error::abort;
+
+
 use quote::quote;
 
-use syn::{parse_macro_input, FnArg, ItemFn, Pat};
+use syn::{parse_macro_input, ItemFn};
 use syn::{Expr, Ident};
 
-use crate::utils::ArgsIndexMap;
 use crate::utils::DIdent;
+use crate::utils::{ident_from_fn_arg, ArgsIndexMap};
 
 #[derive(Debug, Clone, FromMeta)]
 pub struct MakeOrderlessOptions {
@@ -43,23 +43,7 @@ pub fn make_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 	// Get all the arguments on the function itself.
 	let mut arg_map: IndexMap<Ident, Option<Expr>> = IndexMap::new();
 	for arg in &func.sig.inputs {
-		match arg {
-			FnArg::Typed(arg) => {
-				let Pat::Ident(arg_name) = *arg.pat.clone() else {
-					abort! { arg,
-						"the argument was not an identifier";
-						help = "I don't know how you got here, or how this could\
-						 possibly happen, but apparently it can. So I'm writing\
-						 this message to say that you're doing something wrong\
-						 here... Maybe... Or maybe I am. I have no idea.";
-					}
-				};
-				arg_map.insert(arg_name.ident, None);
-			}
-			FnArg::Receiver(_) => {
-				arg_map.insert(Ident::new("self", Span::call_site()), None);
-			}
-		}
+		arg_map.insert(ident_from_fn_arg(arg), None);
 	}
 
 	let defs = options.defs;
