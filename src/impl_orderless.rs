@@ -4,7 +4,6 @@ use darling::export::NestedMeta;
 
 use proc_macro::TokenStream;
 
-
 use proc_macro_error::abort;
 use quote::{quote, ToTokens};
 
@@ -69,7 +68,6 @@ pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 		for input in inputs {
 			order.push(ident_from_fn_arg(input));
 		}
-		let order: Vec<_> = order.iter().collect();
 
 		for (i, attr) in func.clone().attrs.iter().enumerate() {
 			if attr.path().is_ident("make_orderless") {
