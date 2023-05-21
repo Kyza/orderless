@@ -6,8 +6,8 @@ use proc_macro::TokenStream;
 use proc_macro_error::abort;
 use quote::{quote, ToTokens};
 
-use syn::{parse_macro_input, ImplItem, ItemImpl};
-use syn::{Expr, Ident};
+use syn::Ident;
+use syn::{parse_macro_input, ImplItem, ItemImpl, Meta};
 
 use crate::utils::DIdent;
 
@@ -67,10 +67,11 @@ pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 				func.attrs.remove(i);
 
 				// Get the args.
-				let args = attr
-					.clone()
-					.parse_args::<Expr>()
-					.expect("make_orderless was called with no args");
+				let args = if let Meta::List(meta) = attr.meta.clone() {
+					meta.tokens
+				} else {
+					quote! {}
+				};
 
 				// Make a new `create_orderless!`.
 				creates.push(quote! {
