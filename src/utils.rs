@@ -4,10 +4,7 @@ use proc_macro2::Span;
 use proc_macro_error::abort;
 
 use quote::ToTokens;
-use syn::{
-	parse2, parse_quote, Expr, FnArg,
-	Ident, Meta, Pat, Path,
-};
+use syn::{parse2, parse_quote, Expr, FnArg, Ident, Meta, Pat, Path};
 
 pub fn strict_ident_from_path(path: Path) -> Ident {
 	// It could be an actual path, so test for that.
@@ -89,9 +86,10 @@ impl FromMeta for IdentIndexSet {
 	) -> darling::Result<Self> {
 		let mut is = IndexSet::new();
 		for item in items {
-			let ident = parse2::<Ident>(item.to_token_stream());
-			if let Ok(ident) = ident {
-				is.insert(ident);
+			// `self` is a path not an identifier.
+			let path = parse2::<Path>(item.to_token_stream());
+			if let Ok(path) = path {
+				is.insert(strict_ident_from_path(path));
 			} else {
 				abort! { item,
 					"expected an identifier";

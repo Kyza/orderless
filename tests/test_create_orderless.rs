@@ -6,6 +6,7 @@ fn two<T>(a: T, b: T) -> (T, T) {
 
 create_orderless! {
 	func = two,
+	order(a, b),
 	defs(a = false, b = false)
 }
 
