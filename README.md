@@ -3,7 +3,7 @@
 `orderless` generates macros for you that allow you to use orderless/named functions in Rust.
 
 ```rs
-#[make_orderless(defs(a = 2, b))]
+#[make_orderless(defs(a = 2))]
 fn add(a: usize, b: usize) -> usize {
 	a + b
 }

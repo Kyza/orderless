@@ -26,7 +26,7 @@ pub fn call_orderless(input: TokenStream) -> TokenStream {
 /// A procedural macro that's meant for creating macros that run `call_orderless!` with the provided definition.
 ///
 /// ```rs
-/// #[make_orderless(defs(a = 2, b))]
+/// #[make_orderless(defs(a = 2))]
 /// fn add(a: usize, b: usize) -> usize {
 /// 	a + b
 /// }
