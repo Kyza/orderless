@@ -6,6 +6,7 @@ use proc_macro_error::proc_macro_error;
 
 mod call_orderless;
 mod create_orderless;
+mod impl_orderless;
 mod make_orderless;
 mod utils;
 
@@ -77,9 +78,29 @@ pub fn call_orderless(input: TokenStream) -> TokenStream {
 ///
 /// ### `impl`
 ///
-/// Currently you can't define macros inside of `impl` definitions.
+/// ```rs
+/// struct Three<T> {
+/// 	a: T,
+/// 	b: T,
+/// }
 ///
-/// I might make a macro that fixes this in the future, but for now you'll have to use `create_orderless!` instead
+/// // This is required in order for `make_orderless` to work inside it.
+/// // You can choose to override the name as well.
+/// #[impl_orderless(name = Args)]
+/// impl<T> Three<T> {
+/// 	#[make_orderless(
+/// 		defs(self = Three {
+/// 			a: false,
+/// 			b: false
+/// 		}, c)
+/// 	)]
+/// 	pub fn three(self, c: T) -> (T, T, T) {
+/// 		(self.a, self.b, c)
+/// 	}
+/// }
+///
+/// Args__three!(c = true); // (false, false, true)
+/// ```
 pub fn make_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 	make_orderless::make_orderless(attr, item)
 }
@@ -166,4 +187,35 @@ pub fn make_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 pub fn create_orderless(input: TokenStream) -> TokenStream {
 	create_orderless::create_orderless(input)
+}
+
+#[proc_macro_attribute]
+#[proc_macro_error]
+/// A procedural macro that allows `make_orderless` to be used in `impl` blocks.
+///
+/// ```rs
+/// struct Three<T> {
+/// 	a: T,
+/// 	b: T,
+/// }
+///
+/// // This is required in order for `make_orderless` to work inside it.
+/// // You can choose to override the name as well.
+/// #[impl_orderless(name = Args)]
+/// impl<T> Three<T> {
+/// 	#[make_orderless(
+/// 		defs(self = Three {
+/// 			a: false,
+/// 			b: false
+/// 		}, c)
+/// 	)]
+/// 	pub fn three(self, c: T) -> (T, T, T) {
+/// 		(self.a, self.b, c)
+/// 	}
+/// }
+///
+/// Args__three!(c = true); // (false, false, true)
+/// ```
+pub fn impl_orderless(attr: TokenStream, item: TokenStream) -> TokenStream {
+	impl_orderless::impl_orderless(attr, item)
 }

@@ -1,7 +1,7 @@
 [package]
 name = "orderless"
 description = "Generates macros for you that allow you to use orderless/named functions in Rust."
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Kyza"]
 license = "MIT"
@@ -16,7 +16,7 @@ categories = ["development-tools::build-utils", "rust-patterns"]
 darling = "0.20.1"
 indexmap = "1.9.3"
 proc-macro-error = "1.0.4"
-proc-macro2 = "1.0.56"
+proc-macro2 = { version = "1.0.56", features = ["span-locations"] }
 quote = "1.0.27"
 syn = { version = "2.0.15", features = ["full"] }
 

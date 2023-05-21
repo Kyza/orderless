@@ -11,7 +11,7 @@ use crate::utils::ArgsIndexMap;
 use crate::utils::DIdent;
 
 #[derive(Debug, Clone, FromMeta)]
-pub struct CallOrderlessOptions {
+pub struct CreateOrderlessOptions {
 	name: Option<DIdent>,
 	public: Option<bool>,
 	func: ExprPath,
@@ -25,7 +25,7 @@ pub fn create_orderless(input: TokenStream) -> TokenStream {
 			return TokenStream::from(darling::Error::from(e).write_errors());
 		}
 	};
-	let options = match CallOrderlessOptions::from_list(&options) {
+	let options = match CreateOrderlessOptions::from_list(&options) {
 		Ok(v) => v,
 		Err(e) => {
 			return TokenStream::from(e.write_errors());

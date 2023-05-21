@@ -23,7 +23,7 @@ add!(b = 2); // 4
 	- [x] `const` and `static` variables.
 	- [x] Optionally don't provide a default value.
 - [x] Shortcut identical name and value to just the name. `a = a` to `a`.
-- [ ] Attribute macro for `make_orderless` in `impl` blocks.
+- [x] Attribute macro `impl_orderless` for `make_orderless` in `impl` blocks.
 
 ## Docs
 
