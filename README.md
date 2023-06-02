@@ -29,7 +29,6 @@ add!(b = 2); // 4
 
 Documentation is provided on [docs.rs](https://docs.rs/orderless).
 
-
 ## How does it work?
 
 ### `call_orderless!`
